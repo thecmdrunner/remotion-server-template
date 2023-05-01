@@ -19,7 +19,7 @@
 		"cors": "^2.8.5",
 		"dotenv": "^16.0.3",
 		"express": "^4.18.2",
-		"remotion": "3.3.87",
+		"remotion": "4.0.0-alpha.185+1b8f0e746",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	},
