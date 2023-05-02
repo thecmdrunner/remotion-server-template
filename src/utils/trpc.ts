@@ -1,87 +1,53 @@
 /**
  * This is the client-side entrypoint for your tRPC API. It is used to create the `api` object which
- * contains the Next.js App-wrapper, as well as your type-safe React Query hooks.
+ * contains the React App-wrapper, as well as your type-safe React Query hooks.
  *
  * We also create a few inference helpers for input and output types.
  */
 import {createTRPCProxyClient, httpBatchLink, loggerLink} from '@trpc/client';
 import {createTRPCReact} from '@trpc/react-query';
-import {type inferRouterInputs, type inferRouterOutputs} from '@trpc/server';
+import {inferRouterInputs, inferRouterOutputs} from '@trpc/server';
 import superjson from 'superjson';
-import {z} from 'zod';
-import {exampleRouter} from '../server/routers/example';
-import {AppRouter, publicProcedure, t} from '../server/trpc';
+import {SERVER_URL} from '../HelloWorld/constants';
+import {MainRouter, mainRouter} from '../server/router';
 
-const getBaseUrl = () => {
-	if (typeof window !== 'undefined') return ''; // browser should use relative url
-	if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
-	return `http://localhost:${process.env.PORT ?? 5050}`; // dev SSR should use localhost
-};
+export const trpc = createTRPCReact<MainRouter>({});
 
-export const trpc = createTRPCReact<typeof exampleRouter>();
-
-export const api = createTRPCProxyClient<typeof exampleRouter>({
+/** A set of type-safe react-query hooks for your tRPC API. */
+export const api = createTRPCProxyClient<MainRouter>({
+	/**
+	 * Transformer used for data de-serialization from the server.
+	 *
+	 * @see https://trpc.io/docs/data-transformers
+	 */
 	transformer: superjson,
+	/**
+	 * Links used to determine request flow from client to server.
+	 *
+	 * @see https://trpc.io/docs/links
+	 */
 	links: [
+		loggerLink({
+			enabled: (opts) =>
+				process.env.NODE_ENV === 'development' ||
+				(opts.direction === 'down' && opts.result instanceof Error),
+		}),
 		httpBatchLink({
-			// url: `${getBaseUrl()}/api/trpc`,
-			url: 'http://localhost:5050/trpc',
-			// You can pass any HTTP headers you wish here
-			// async headers() {
-			//   return {
-			//     authorization: getAuthCookie(),
-			//   };
-			// },
+			url: `${SERVER_URL}/trpc`,
 		}),
 	],
 });
 
-/** A set of type-safe react-query hooks for your tRPC API. */
-// export const api = createTRPCNext<AppRouter>({
-// 	config() {
-// 		return {
-// 			/**
-// 			 * Transformer used for data de-serialization from the server.
-// 			 *
-// 			 * @see https://trpc.io/docs/data-transformers
-// 			 */
-// 			transformer: superjson,
-
-// 			/**
-// 			 * Links used to determine request flow from client to server.
-// 			 *
-// 			 * @see https://trpc.io/docs/links
-// 			 */
-// 			links: [
-// 				loggerLink({
-// 					enabled: (opts) =>
-// 						process.env.NODE_ENV === 'development' ||
-// 						(opts.direction === 'down' && opts.result instanceof Error),
-// 				}),
-// 				httpBatchLink({
-// 					url: `${getBaseUrl()}/api/trpc`,
-// 				}),
-// 			],
-// 		};
-// 	},
-// 	/**
-// 	 * Whether tRPC should await queries when server rendering pages.
-// 	 *
-// 	 * @see https://trpc.io/docs/nextjs#ssr-boolean-default-false
-// 	 */
-// 	ssr: false,
-// });
-
 /**
  * Inference helper for inputs.
  *
- * @example type HelloInput = RouterInputs['example']['hello']
+ * @example type HelloInput = RouterInputs['main']['hello']
  */
-// export type RouterInputs = inferRouterInputs<AppRouter>;
+export type RouterInputs = inferRouterInputs<MainRouter>;
 
 /**
  * Inference helper for outputs.
  *
- * @example type HelloOutput = RouterOutputs['example']['hello']
+ * @example type HelloOutput = RouterOutputs['main']['hello']
  */
-// export type RouterOutputs = inferRouterOutputs<AppRouter>;
+export type RouterOutputs = inferRouterOutputs<MainRouter>;

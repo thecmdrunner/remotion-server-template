@@ -1,4 +1,3 @@
-startServer;
 import {spawn} from 'child_process';
 import {startServer} from './server';
 

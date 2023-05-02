@@ -14,7 +14,7 @@
  *
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
-import * as trpcExpress from '@trpc/server/adapters/express';
+import trpcExpress from '@trpc/server/adapters/express';
 
 /** Replace this with an object if you want to pass things to `createContextInner`. */
 type CreateContextOptions = Record<string, never>;
@@ -54,7 +54,7 @@ export const createTRPCContext = ({
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
-import {TRPCError, initTRPC} from '@trpc/server';
+import {initTRPC} from '@trpc/server';
 import superjson from 'superjson';
 import {ZodError} from 'zod';
 
