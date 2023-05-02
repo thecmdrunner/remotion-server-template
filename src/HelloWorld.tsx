@@ -1,4 +1,5 @@
-import {spring} from 'remotion';
+import {useState} from 'react';
+import {continueRender, delayRender, spring} from 'remotion';
 import {
 	AbsoluteFill,
 	interpolate,
@@ -9,11 +10,19 @@ import {
 import {Logo} from './HelloWorld/Logo';
 import {Subtitle} from './HelloWorld/Subtitle';
 import {Title} from './HelloWorld/Title';
+import {trpc} from './utils/trpc';
 
 export const HelloWorld: React.FC<{
 	titleText: string;
 	titleColor: string;
 }> = ({titleText, titleColor}) => {
+	const [handle] = useState(() => delayRender());
+
+	const {data} = trpc.sayHello.useQuery(
+		{text: 'Remotion + tRPC!'},
+		{onSettled: () => continueRender(handle)}
+	);
+
 	const frame = useCurrentFrame();
 	const {durationInFrames, fps} = useVideoConfig();
 
@@ -53,7 +62,10 @@ export const HelloWorld: React.FC<{
 				</AbsoluteFill>
 				{/* Sequences can shift the time for its children! */}
 				<Sequence from={35}>
-					<Title titleText={titleText} titleColor={titleColor} />
+					<Title
+						titleText={data?.greeting ?? titleText}
+						titleColor={titleColor}
+					/>
 				</Sequence>
 				{/* The subtitle will only enter on the 75th frame. */}
 				<Sequence from={75}>
