@@ -13,7 +13,7 @@ export const startServer = () => {
 	const port = SERVER_PORT;
 
 	const tRPCMiddleware = trpcExpress.createExpressMiddleware({
-		main: mainRouter,
+		router: mainRouter,
 		createContext: createTRPCContext,
 	});
 
