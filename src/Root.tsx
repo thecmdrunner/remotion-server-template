@@ -1,5 +1,5 @@
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {httpBatchLink} from '@trpc/client';
+import {httpBatchLink, loggerLink} from '@trpc/client';
 import {useState} from 'react';
 import {Composition} from 'remotion';
 import {HelloWorld} from './HelloWorld';
@@ -10,9 +10,25 @@ import {SERVER_URL} from './HelloWorld/constants';
 export const RemotionRoot: React.FC = () => {
 	const [queryClient] = useState(() => new QueryClient());
 	const [trpcClient] = useState(() =>
+		/** A set of type-safe react-query hooks for your tRPC API. */
 		trpc.createClient({
+			/**
+			 * Transformer used for data de-serialization from the server.
+			 *
+			 * @see https://trpc.io/docs/data-transformers
+			 */
 			transformer: superjson,
+			/**
+			 * Links used to determine request flow from client to server.
+			 *
+			 * @see https://trpc.io/docs/links
+			 */
 			links: [
+				loggerLink({
+					enabled: (opts) =>
+						process.env.NODE_ENV === 'development' ||
+						(opts.direction === 'down' && opts.result instanceof Error),
+				}),
 				httpBatchLink({
 					url: `${SERVER_URL}/trpc`,
 				}),

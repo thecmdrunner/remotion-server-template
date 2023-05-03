@@ -18,8 +18,8 @@ export const startServer = () => {
 	});
 
 	app.use(cors({origin: '*'}));
-	app.use(express.json());
 	app.use('/trpc', tRPCMiddleware);
+	app.use(express.json());
 
 	app.post(`/getdata`, async (req, res) => {
 		try {
