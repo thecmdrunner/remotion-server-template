@@ -25,9 +25,9 @@ export const RemotionRoot: React.FC = () => {
 			 */
 			links: [
 				loggerLink({
-					enabled: (opts) =>
-						process.env.NODE_ENV === 'development' ||
-						(opts.direction === 'down' && opts.result instanceof Error),
+					enabled: (opts) => true, // For now, show Logger links always.
+					// process.env.NODE_ENV === 'development' ||
+					// (opts.direction === 'down' && opts.result instanceof Error),
 				}),
 				httpBatchLink({
 					url: `${SERVER_URL}/trpc`,
@@ -39,22 +39,24 @@ export const RemotionRoot: React.FC = () => {
 	return (
 		<trpc.Provider client={trpcClient} queryClient={queryClient}>
 			<QueryClientProvider client={queryClient}>
-				<Composition
-					// You can take the "id" to render a video:
-					// npx remotion render src/index.ts <id> out/video.mp4
-					id="HelloWorld"
-					component={HelloWorld}
-					durationInFrames={150}
-					fps={30}
-					width={1920}
-					height={1080}
-					// You can override these props for each render:
-					// https://www.remotion.dev/docs/parametrized-rendering
-					defaultProps={{
-						titleText: 'Welcome to Remotion',
-						titleColor: 'black',
-					}}
-				/>
+				<>
+					<Composition
+						// You can take the "id" to render a video:
+						// npx remotion render src/index.ts <id> out/video.mp4
+						id="HelloWorld"
+						component={HelloWorld}
+						durationInFrames={150}
+						fps={30}
+						width={1920}
+						height={1080}
+						// You can override these props for each render:
+						// https://www.remotion.dev/docs/parametrized-rendering
+						defaultProps={{
+							titleText: 'Welcome to Remotion',
+							titleColor: 'black',
+						}}
+					/>
+				</>
 			</QueryClientProvider>
 		</trpc.Provider>
 	);
